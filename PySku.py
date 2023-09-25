@@ -4,6 +4,8 @@ Updated 9/22/23
 SKU Generator Project
 
 Will generate a SKU for items based off name, qty, etc.
+Uses a given csv file inside 'files' in the same directory
+
 Criteria is as follows:
 
 3 digits for brand name (text) note: avoid using the letter O
@@ -19,9 +21,10 @@ BTS00103CP - Botanical Science Microdermabrasion Creme, 3.3 oz Case Pack of 12
 
 import csv
 import os.path
+import re
 
 def main():
-    inputFile = input("Enter file name: ").strip()
+    inputFile = (f'{input("Input file name: ").strip()}.csv')
 
     while not os.path.isfile("files/" + inputFile):
 
@@ -32,15 +35,66 @@ def main():
                 quit()
             else:
                 print('\nFile does not exist.')
-                inputFile = input('Enter file name. Enter "q" to quit: ').strip()
+                inputFile = (f'{input("Input file name: ").strip()}.csv')
 
-    outputFile = input("output file name")
+    outputFile = (f'{input("Output file name: ").strip()}.csv')
 
     while os.path.isfile(f'files/{outputFile}'):
+            
             ans = input('Overwrite file with same name? (y/n): ').lower().strip()
-            while ans not in 'yn':
-                 ans = input('(y/n): ')
+            while ans != 'y' and ans != 'n':
+                 ans = input('(y/n): ').lower().strip()
+            if ans == 'y':
+                 break
+            else:
+                 outputFile = (f'{input("New output file name: ").strip()}.csv')
+    
+    uniVendors = {}
+    uniBrandDigits = {}
 
+    with open(f'files/{outputFile}', 'w+', newline='') as csvfile:
+         
+         writer = csv.writer(csvfile)
+         writer.writerow(['SKU', 'Vendor', 'Product Name', 'Size', 'Type'])
+
+         with open(f'files/{inputFile}', 'r') as inputCSV:
+            
+            reader = csv.reader(inputCSV)
+
+            for line in reader:
+
+                brandDigits = ''
+                sizeDigits = ''
+                uomDigits = ''
+
+                print(line)
+
+                sliceStart = 1
+                sliceEnd = 3
+                vendor = line[0].lower().replace('o', '')
+
+                while True:
+                    if vendor.isspace() or "-" in vendor:
+                        pass
+                    else:
+                        brandDigits = vendor[sliceStart:sliceEnd].upper()
+                        print(brandDigits)
+                        if brandDigits in uniBrandDigits and line[0] not in uniVendors:
+                            sliceStart += 1
+                            sliceEnd += 1
+                        else:
+                            uniBrandDigits.append(brandDigits)
+                            uniVendors[line[0]] += 1
+                            break
+
+                print("help")
+
+            if uniVendors.get(line[0]) == None:
+                uniVendors[line[0]] = 1
+            else:
+                uniVendors[line[0]] += 1
+
+            print(uniVendors)
 
     print("Success")
 
