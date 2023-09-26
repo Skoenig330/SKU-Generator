@@ -49,8 +49,8 @@ def main():
             else:
                  outputFile = (f'{input("New output file name: ").strip()}.csv')
     
-    uniVendors = {} #stores unique vendor as element, number of vendor products as key
-    uniBrandDigs = {}
+    uniVendors = {} # stores unique vendor as element, number of vendor products as key
+    uniBrandDigs = set([])
 
     with open(f'files/{outputFile}', 'w+', newline='') as csvfile:
          
@@ -69,32 +69,48 @@ def main():
 
                 print(line)
 
-                sliceStart = 1
+                sliceStart = 0
                 sliceEnd = 3
                 vendor = line[0].lower().replace('o', '')
 
-                while True:
-                    if vendor.isspace() or "-" in vendor:
-                        pass
-                    else:
+                while True: # brand digits logic. As lines are iterated through it assigns updated count of unique items per vendor to uniVendors
+
+                    print(uniVendors)
+
+                    if vendor.isalnum():
+
                         brandDigs = vendor[sliceStart:sliceEnd].upper()
                         print(brandDigs)
+
                         if brandDigs in uniBrandDigs and line[0] not in uniVendors:
                             sliceStart += 1
                             sliceEnd += 1
                         else:
-                            uniBrandDigs.append(brandDigs)
-                            uniVendors[line[0]] += 1
+                            uniBrandDigs.add(brandDigs)
                             break
+                    else:
+                        x = re.split('\W+', vendor) #temp var to hold the altered vendor name. Original vendor name should not be changed, needs to be written to output file.
+
+                        sliceStart = 0
+                        sliceEnd = 1
+                        
+                        if len(x) >= 3:
+                            for i in range(3):
+                                brandDigs = brandDigs + (x[0][sliceStart:sliceEnd]).upper()
+                                x.pop(0)
+                        # TODO: Add logic for when len is 2, 
+                        # TODO: check if brandDigs already used by another vendor, add functionality if true. Like above.
+                        break
 
                 print("help")
 
-            if uniVendors.get(line[0]) == None:
-                uniVendors[line[0]] = 1
-            else:
-                uniVendors[line[0]] += 1
+                if uniVendors.get(line[0]) == None:
+                    uniVendors[line[0]] = 1
+                else:
+                    uniVendors[line[0]] += 1
 
-            print(uniVendors)
+                print(uniVendors)
+                print(brandDigs)
 
     print("Success")
 
