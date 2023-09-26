@@ -49,8 +49,8 @@ def main():
             else:
                  outputFile = (f'{input("New output file name: ").strip()}.csv')
     
-    uniVendors = {}
-    uniBrandDigits = {}
+    uniVendors = {} #stores unique vendor as element, number of vendor products as key
+    uniBrandDigs = {}
 
     with open(f'files/{outputFile}', 'w+', newline='') as csvfile:
          
@@ -63,9 +63,9 @@ def main():
 
             for line in reader:
 
-                brandDigits = ''
-                sizeDigits = ''
-                uomDigits = ''
+                brandDigs = ''
+                sizeDigs = ''
+                uomDigs = ''
 
                 print(line)
 
@@ -77,13 +77,13 @@ def main():
                     if vendor.isspace() or "-" in vendor:
                         pass
                     else:
-                        brandDigits = vendor[sliceStart:sliceEnd].upper()
-                        print(brandDigits)
-                        if brandDigits in uniBrandDigits and line[0] not in uniVendors:
+                        brandDigs = vendor[sliceStart:sliceEnd].upper()
+                        print(brandDigs)
+                        if brandDigs in uniBrandDigs and line[0] not in uniVendors:
                             sliceStart += 1
                             sliceEnd += 1
                         else:
-                            uniBrandDigits.append(brandDigits)
+                            uniBrandDigs.append(brandDigs)
                             uniVendors[line[0]] += 1
                             break
 
