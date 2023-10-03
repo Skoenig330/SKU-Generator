@@ -24,6 +24,8 @@ import os.path
 import re
 
 def main():
+
+    print(f'\nCSV FILE SHOULD BE FORMATTED AS: Vendor, Product Name, Size, Type')
     inputFile = (f'{input("Input file name: ").strip()}.csv')
 
     while not os.path.isfile("files/" + inputFile):
@@ -71,9 +73,10 @@ def main():
 
                 sliceStart = 0
                 sliceEnd = 3
-                vendor = line[0].lower().replace('o', '')
+                vendor = line[0].lower().replace('o', '') # temp var to hold the altered vendor name. Original vendor name will not be changed, needs to be written to output file.
 
-                while True: # brand digits logic. As lines are iterated through it assigns updated count of unique items per vendor to uniVendors
+                # brand digits logic. As lines are iterated through it assigns updated count of unique items per vendor to uniVendors
+                while True: 
 
                     print(uniVendors)
 
@@ -82,27 +85,42 @@ def main():
                         brandDigs = vendor[sliceStart:sliceEnd].upper()
                         print(brandDigs)
 
-                        if brandDigs in uniBrandDigs and line[0] not in uniVendors:
+                        if brandDigs in uniBrandDigs and line[0] not in uniVendors: # Checks that another vendor isn't already using the same digits
                             sliceStart += 1
                             sliceEnd += 1
                         else:
                             uniBrandDigs.add(brandDigs)
                             break
-                    else:
-                        x = re.split('\W+', vendor) #temp var to hold the altered vendor name. Original vendor name should not be changed, needs to be written to output file.
 
+                    else:
+
+                        vendor = re.split('\W+', vendor) 
                         sliceStart = 0
                         sliceEnd = 1
                         
-                        if len(x) >= 3:
-                            for i in range(3):
-                                brandDigs = brandDigs + (x[0][sliceStart:sliceEnd]).upper()
-                                x.pop(0)
-                        # TODO: Add logic for when len is 2, 
-                        # TODO: check if brandDigs already used by another vendor, add functionality if true. Like above.
-                        break
+                        if len(vendor) >= 3:
 
-                print("help")
+                            for i in range(3):
+                                brandDigs += (vendor[0][sliceStart:sliceEnd]).upper()
+                                vendor.pop(0)
+
+                        else: 
+
+                            brandDigs += vendor[0][sliceStart:sliceEnd]
+                            vendor.pop(0)
+                            brandDigs += vendor[0][sliceStart:sliceEnd + 1]
+                            brandDigs = brandDigs.upper()
+                            print(f'\nDOES IT WORK? {brandDigs}\n')
+
+                        if brandDigs in uniBrandDigs and line[0] not in uniVendors:
+                            sliceStart += 1
+                            sliceEnd += 1
+
+                        else:
+                            uniBrandDigs.add(brandDigs)
+                            break
+                
+                # Size Digits Logic...
 
                 if uniVendors.get(line[0]) == None:
                     uniVendors[line[0]] = 1
